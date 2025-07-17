@@ -1,24 +1,27 @@
 import { Header } from "../../components/Header";
-import { MenuComponents } from "../HomePage/MenuComponents";
-import { NewsType } from "../HomePage/types";
-import { StyledFooter } from "../../globalStyle";
 import {
   StyledBreakingNews,
   StyledMain,
   StyledSection,
   StyledArticle,
   StyledAside,
-} from "../HomePage/styling";
+  MenuContainer,
+} from "./styling";
+import { MenuComponents } from "./MenuComponents";
+import { NewsType } from "./types";
+import { StyledFooter } from "../../globalStyle";
 
 type HomePageComponentProps = {
   news: NewsType[];
 };
 
-export const RankingComponent = ({ news }: HomePageComponentProps) => {
+export const HomeMobileView = ({ news }: HomePageComponentProps) => {
   return (
     <>
       <Header />
-      <MenuComponents />
+      <MenuContainer>
+        <MenuComponents />
+      </MenuContainer>
       <StyledBreakingNews>
         Ultim'ora: Wimbledon, Sinner in semifinale! | Calciomercato: Osimhen
         verso il Galatasaray | Fognini annuncia il ritiro

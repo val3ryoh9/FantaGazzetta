@@ -8,8 +8,6 @@ export interface PageWrapperProps {
 export const PageWrapper = styled.div<PageWrapperProps>`
   display: flex;
   flex-direction: column;
-  width: 100%;
-  min-height: 100vh;
   background-color: ${(props) => props.$background || "#f7f7f7"};
   text-align: ${(props) => props.$textAlign || "initial"};
   position: relative;
@@ -22,7 +20,7 @@ export const StyledAppWrapper = styled.div`
   min-height: 100vh;
 `;
 
-export const StyledMenu = styled.nav`
+export const MenuContainer = styled.nav`
   background: #ff0066;
   color: #fff;
   font-weight: 700;
@@ -64,15 +62,14 @@ export const StyledMain = styled.main`
 `;
 
 export const StyledSection = styled.section`
-  flex: 3;
-  margin-right: -15px;
-`;
-
-export const StyledNewsGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  padding: 0 25px 0 25px;
+  flex: auto;
+  padding-left: 25px;
+  gap: 25px;
+
+  @media (max-width: 900px) {
+    padding-right: 25px;
+  }
 `;
 
 export const StyledArticle = styled.article`
@@ -127,13 +124,10 @@ export const StyledAside = styled.aside`
     color: #222;
     font-weight: 600;
   }
-`;
 
-export const StyledFooter = styled.footer`
-  background: #222;
-  color: #fff;
-  padding: 24px 0;
-  margin-top: 32px;
-  font-size: 15px;
-  text-align: center;
+  @media (max-width: 900px) {
+    width: 100%;
+    box-shadow: 0 2px 8px #eee;
+    max-width: 91%;
+  }
 `;
