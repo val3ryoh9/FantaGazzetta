@@ -1,5 +1,5 @@
 import { NewsType } from "../Pages/HomePage/types";
-import frontEndShark from "../assets/images/FrontEnd_Shark_Clean.png";
+import frontEndShark from "../assets/images/test.png";
 
 export const newsData: NewsType[] = [
   {

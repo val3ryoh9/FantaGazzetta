@@ -21,8 +21,12 @@ export const StyledAppWrapper = styled.div`
 `;
 
 export const MenuContainer = styled.nav`
+  display: flex;
+  justify-content: center;
+  height: 65px;
   background: #ff0066;
   color: #fff;
+  font-size: 45px;
   font-weight: 700;
   ul {
     display: flex;
@@ -39,6 +43,11 @@ export const MenuContainer = styled.nav`
       }
     }
   }
+
+  @media (max-width: 900px) {
+    height: 40px;
+    font-size: 20px;
+  }
 `;
 
 export const StyledBreakingNews = styled.section`
@@ -49,6 +58,10 @@ export const StyledBreakingNews = styled.section`
   font-size: 18px;
   border-bottom: 1px solid #ffb3d1;
   text-align: center;
+
+  @media (max-width: 900px) {
+    padding: 15px;
+  }
 `;
 
 export const StyledMain = styled.main`

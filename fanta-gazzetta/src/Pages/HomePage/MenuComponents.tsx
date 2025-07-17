@@ -7,6 +7,12 @@ const StyledListItem = styled.li`
   cursor: pointer;
 `;
 
+const StyledUl = styled.ul`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const menuData = [
   {
     title: "Calcio",
@@ -17,12 +23,12 @@ export const MenuComponents = () => {
   const navigate = useNavigate();
 
   return (
-    <ul>
+    <StyledUl>
       {_.map(menuData, (item) => (
         <StyledListItem onClick={() => navigate(RANKING)}>
           {item.title}
         </StyledListItem>
       ))}
-    </ul>
+    </StyledUl>
   );
 };
