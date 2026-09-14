@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { Button, Input, InputNumber, App as AntdApp } from "antd";
+import { Button, InputNumber, App as AntdApp } from "antd";
 import { uid } from "../../utils";
 
 const Head = styled.div`
@@ -88,7 +88,7 @@ const PtTd = styled(Td)`
 `;
 const Match = styled.div`
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) 64px minmax(150px, 1fr);
+  grid-template-columns: minmax(150px, 1fr) 70px minmax(150px, 1fr);
   align-items: center;
   gap: 12px;
   padding: 9px 12px;
@@ -104,6 +104,16 @@ const Score = styled.div`
   display: flex;
   justify-content: center;
   gap: 5px;
+`;
+const ScoreValue = styled.span`
+  width: 32px;
+  padding: 5px 0;
+  border: 1px solid ${({ theme }) => theme.colors.line};
+  border-radius: 2px;
+  color: ${({ theme }) => theme.colors.ink};
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
 `;
 const Hint = styled.p`
   color: ${({ theme }) => theme.colors.inkSoft};
@@ -273,12 +283,6 @@ export default function CoppaCircoPage({
     );
   };
 
-  const updateTeamName = (id, name) => {
-    setTeams((current) =>
-      current.map((team) => (team.id === id ? { ...team, name } : team)),
-    );
-  };
-
   const save = async () => {
     const ok = await onSaveCoppa({ teams, matches });
     message[ok ? "success" : "error"](
@@ -305,10 +309,7 @@ export default function CoppaCircoPage({
       </Head>
       <Hint>
         Dieci squadre, girone unico: ogni squadra affronta tutte le altre una
-        volta. Inserisci i risultati nelle giornate: vittoria = 3 punti,
-        pareggio = 1 punto, sconfitta = 0 punti. Pt, G, V, N, P, GF, GS e DR
-        vengono aggiornati automaticamente e la classifica si ordina per punti,
-        differenza reti e gol segnati.
+        volta.
       </Hint>
 
       <Section>
@@ -333,20 +334,7 @@ export default function CoppaCircoPage({
               {table.map((team, index) => (
                 <tr key={team.id}>
                   <Td>{index + 1}</Td>
-                  <TeamTd>
-                    {canManage ? (
-                      <Input
-                        size="small"
-                        bordered={false}
-                        value={team.name}
-                        onChange={(event) =>
-                          updateTeamName(team.id, event.target.value)
-                        }
-                      />
-                    ) : (
-                      team.name
-                    )}
-                  </TeamTd>
+                  <TeamTd>{team.name}</TeamTd>
                   <PtTd>{team.points}</PtTd>
                   <Td>{team.played}</Td>
                   <Td>{team.wins}</Td>
@@ -376,22 +364,29 @@ export default function CoppaCircoPage({
                   {teamById.get(match.homeId)?.name || "Squadra"}
                 </MatchTeam>
                 <Score>
-                  <InputNumber
-                    min={0}
-                    disabled={!canManage}
-                    value={match.homeGoals}
-                    onChange={(value) =>
-                      updateScore(match.id, "homeGoals", value)
-                    }
-                  />
-                  <InputNumber
-                    min={0}
-                    disabled={!canManage}
-                    value={match.awayGoals}
-                    onChange={(value) =>
-                      updateScore(match.id, "awayGoals", value)
-                    }
-                  />
+                  {canManage ? (
+                    <>
+                      <InputNumber
+                        min={0}
+                        value={match.homeGoals}
+                        onChange={(value) =>
+                          updateScore(match.id, "homeGoals", value)
+                        }
+                      />
+                      <InputNumber
+                        min={0}
+                        value={match.awayGoals}
+                        onChange={(value) =>
+                          updateScore(match.id, "awayGoals", value)
+                        }
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <ScoreValue>{match.homeGoals ?? "-"}</ScoreValue>
+                      <ScoreValue>{match.awayGoals ?? "-"}</ScoreValue>
+                    </>
+                  )}
                 </Score>
                 <MatchTeam $away>
                   {teamById.get(match.awayId)?.name || "Squadra"}

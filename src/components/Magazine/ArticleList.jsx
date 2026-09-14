@@ -4,24 +4,36 @@ import { Button, Popconfirm, Empty } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { fmtDate } from "../../utils";
 
-const HeroCard = styled.article`
-  margin-bottom: 8px;
+const TopGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+  }
+`;
+const TopCard = styled.article`
+  min-width: 0;
   cursor: pointer;
 `;
-const HeroImg = styled.img`
+const TopImage = styled.img`
   width: 100%;
-  aspect-ratio: 16 / 8.2;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
   background: ${({ theme }) => theme.colors.paperDim};
 `;
-const HeroTitle = styled.h1`
-  font-family: ${({ theme }) => theme.fonts.serif};
-  font-weight: 700;
-  font-size: 34px;
-  line-height: 1.14;
-  margin: 16px 0 8px;
+const TopPlaceholder = styled.div`
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: ${({ theme }) => theme.colors.paperDim};
+`;
+const TopTitle = styled.h2`
+  margin: 10px 0 6px;
   color: ${({ theme }) => theme.colors.pitchDark};
-  letter-spacing: -0.2px;
+  font-family: ${({ theme }) => theme.fonts.serif};
+  font-size: 22px;
+  line-height: 1.15;
 `;
 const Meta = styled.div`
   font-size: 13px;
@@ -123,23 +135,32 @@ export default function ArticleList({
   const sorted = [...articles].sort(
     (a, b) => new Date(b.date) - new Date(a.date),
   );
-  const [hero, ...rest] = sorted;
+  const topArticles = sorted.slice(0, 3);
+  const rest = sorted.slice(3);
 
   return (
     <div>
-      <HeroCard onClick={() => onSelect(hero.id)}>
-        {hero.image && <HeroImg src={hero.image} />}
-        <HeroTitle>{hero.title}</HeroTitle>
-        <Meta>
-          di {hero.author || "Admin"} &middot; {fmtDate(hero.date)}
-        </Meta>
-        <Excerpt>{hero.excerpt}</Excerpt>
-        {canManage && (
-          <Actions>
-            <DeleteButton onConfirm={() => onDelete(hero.id)} />
-          </Actions>
-        )}
-      </HeroCard>
+      <TopGrid>
+        {topArticles.map((article) => (
+          <TopCard key={article.id} onClick={() => onSelect(article.id)}>
+            {article.image ? (
+              <TopImage src={article.image} />
+            ) : (
+              <TopPlaceholder />
+            )}
+            <TopTitle>{article.title}</TopTitle>
+            <Meta>
+              di {article.author || "Admin"} &middot; {fmtDate(article.date)}
+            </Meta>
+            <RowExcerpt>{article.excerpt}</RowExcerpt>
+            {canManage && (
+              <Actions>
+                <DeleteButton onConfirm={() => onDelete(article.id)} />
+              </Actions>
+            )}
+          </TopCard>
+        ))}
+      </TopGrid>
 
       {rest.length > 0 && <Rule />}
 

@@ -96,10 +96,11 @@ export default function App() {
   };
 
   const exitLeague = () => {
-    sessionStorage.removeItem("Fantagazzetta_auth_mode");
+    setPage("magazine");
     setLeague(null);
     setRole(null);
     setReady(false);
+    setError("");
   };
 
   const updateLeagueData = async (nextData) => {
