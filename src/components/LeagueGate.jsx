@@ -130,17 +130,23 @@ export default function LeagueGate({
   onSelect,
   onExit,
   requiresPassword,
+  initialLeagueId,
 }) {
-  const [selectedId, setSelectedId] = useState(leagues[0]?.id || "");
+  const [selectedId, setSelectedId] = useState(
+    initialLeagueId || leagues[0]?.id || "",
+  );
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
   React.useEffect(() => {
-    if (!selectedId && leagues.length > 0) {
-      setSelectedId(leagues[0].id);
+    if (
+      leagues.length > 0 &&
+      !leagues.some((league) => league.id === selectedId)
+    ) {
+      setSelectedId(initialLeagueId || leagues[0].id);
     }
-  }, [leagues, selectedId]);
+  }, [initialLeagueId, leagues, selectedId]);
 
   const submit = async (event) => {
     event.preventDefault();

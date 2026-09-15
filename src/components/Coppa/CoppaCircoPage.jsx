@@ -1,7 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { Button, InputNumber, App as AntdApp } from "antd";
 import { uid } from "../../utils";
+
+const fadeInSlide = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+`;
 
 const Head = styled.div`
   display: flex;
@@ -86,39 +97,190 @@ const PtTd = styled(Td)`
   color: ${({ theme }) => theme.colors.goldDeep};
   background: rgba(199, 154, 61, 0.08);
 `;
+
+/* MATCH & LAYOUT FIX PER IL TESTO LUNGO */
 const Match = styled.div`
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) 70px minmax(150px, 1fr);
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 12px;
-  padding: 9px 12px;
+  gap: 8px;
+  padding: 9px 8px;
   border-top: 1px solid ${({ theme }) => theme.colors.line};
   background: ${({ theme }) => theme.colors.white};
   font-family: ${({ theme }) => theme.fonts.ui};
+
+  @media (max-width: 480px) {
+    padding: 8px 6px;
+    gap: 4px;
+  }
 `;
+
 const MatchTeam = styled.span`
   text-align: ${({ $away }) => ($away ? "left" : "right")};
   font-weight: 600;
+  font-size: 13px;
+  line-height: 1.2;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  @media (max-width: 480px) {
+    font-size: 11px;
+  }
 `;
+
 const Score = styled.div`
   display: flex;
   justify-content: center;
-  gap: 5px;
+  align-items: center;
+  gap: 4px;
+
+  /* Ridimensiona gli InputNumber di Antd su schermi piccoli */
+  .ant-input-number {
+    width: 36px !important;
+
+    @media (max-width: 480px) {
+      width: 30px !important;
+    }
+  }
+
+  .ant-input-number-input {
+    padding: 0 2px !important;
+    text-align: center;
+    font-size: 13px;
+
+    @media (max-width: 480px) {
+      font-size: 11px;
+    }
+  }
+
+  .ant-input-number-handler-wrap {
+    display: none; /* Nasconde le freccette per guadagnare spazio su mobile */
+  }
 `;
+
 const ScoreValue = styled.span`
-  width: 32px;
-  padding: 5px 0;
+  width: 28px;
+  padding: 4px 0;
   border: 1px solid ${({ theme }) => theme.colors.line};
   border-radius: 2px;
   color: ${({ theme }) => theme.colors.ink};
   text-align: center;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
   pointer-events: none;
+
+  @media (max-width: 480px) {
+    width: 22px;
+    font-size: 11px;
+  }
 `;
+
 const Hint = styled.p`
   color: ${({ theme }) => theme.colors.inkSoft};
   font: 12px ${({ theme }) => theme.fonts.ui};
   margin: 12px 0 0;
+`;
+const Bracket = styled.div`
+  display: grid;
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+  gap: 16px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+`;
+const MobileBracketNav = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+`;
+const BracketTabButton = styled.button`
+  background: ${({ $active, theme }) =>
+    $active ? theme.colors.pitchDark : theme.colors.paper};
+  color: ${({ $active, theme }) =>
+    $active ? theme.colors.paper : theme.colors.pitchDark};
+  border: 1px solid ${({ theme }) => theme.colors.line};
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: ${({ $active }) =>
+    $active ? "0 2px 8px rgba(0, 0, 0, 0.15)" : "none"};
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+const BracketPlayIn = styled.div`
+  display: grid;
+  margin-top: 16px;
+  grid-template-columns: repeat(2, minmax(190px, 1fr));
+  gap: 16px;
+  overflow-x: auto;
+
+  @media (max-width: 760px) {
+    grid-template-columns: repeat(2, 220px);
+  }
+`;
+const BracketColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    display: ${({ $showMobile }) => ($showMobile ? "flex" : "none")};
+    gap: 12px;
+    width: 100%;
+    ${({ $showMobile }) =>
+      $showMobile &&
+      css`
+        animation: ${fadeInSlide} 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      `}
+  }
+`;
+const BracketColumnTitle = styled.h3`
+  margin: 0 0 4px;
+  color: ${({ theme }) => theme.colors.pitchDark};
+  font: 600 14px ${({ theme }) => theme.fonts.ui};
+  text-align: center;
+`;
+const BracketMatch = styled.div`
+  padding: 10px 12px;
+  border: 1px solid ${({ theme }) => theme.colors.line};
+  border-radius: 4px;
+  background: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 4px 12px rgba(22, 48, 42, 0.06);
+`;
+const BracketTeam = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  color: ${({ $placeholder, theme }) =>
+    $placeholder ? theme.colors.inkSoft : theme.colors.pitchDark};
+  font: 600 13px ${({ theme }) => theme.fonts.ui};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.paperDim};
+  &:last-child {
+    border-bottom: 0;
+  }
 `;
 
 const TEAM_COUNT = 10;
@@ -130,48 +292,36 @@ function createTeams() {
   }));
 }
 
-function pairKey(firstId, secondId) {
-  return [firstId, secondId].sort().join(":");
-}
-
 function createMatches(teams, previousMatches = []) {
-  const previousByPair = new Map(
-    previousMatches.map((match) => [
-      pairKey(match.homeId, match.awayId),
-      match,
-    ]),
+  const previousByDirection = new Map(
+    previousMatches.map((match) => [`${match.homeId}:${match.awayId}`, match]),
   );
-  const rotation = [...teams];
   const matches = [];
 
-  for (let round = 0; round < teams.length - 1; round += 1) {
-    for (let index = 0; index < teams.length / 2; index += 1) {
-      const first = rotation[index];
-      const second = rotation[teams.length - 1 - index];
-      const home = round % 2 === 0 ? first : second;
-      const away = round % 2 === 0 ? second : first;
-      const previous = previousByPair.get(pairKey(home.id, away.id));
-      const sameDirection = previous?.homeId === home.id;
+  for (let leg = 0; leg < 2; leg += 1) {
+    const rotation = [...teams];
+    for (let round = 0; round < teams.length - 1; round += 1) {
+      for (let index = 0; index < teams.length / 2; index += 1) {
+        const first = rotation[index];
+        const second = rotation[teams.length - 1 - index];
+        const firstHome = round % 2 === 0 ? first : second;
+        const firstAway = round % 2 === 0 ? second : first;
+        const home = leg === 0 ? firstHome : firstAway;
+        const away = leg === 0 ? firstAway : firstHome;
+        const previous = previousByDirection.get(`${home.id}:${away.id}`);
 
-      matches.push({
-        id: uid(),
-        matchday: round + 1,
-        homeId: home.id,
-        awayId: away.id,
-        homeGoals: previous
-          ? sameDirection
-            ? previous.homeGoals
-            : previous.awayGoals
-          : null,
-        awayGoals: previous
-          ? sameDirection
-            ? previous.awayGoals
-            : previous.homeGoals
-          : null,
-      });
+        matches.push({
+          id: uid(),
+          matchday: leg * (teams.length - 1) + round + 1,
+          homeId: home.id,
+          awayId: away.id,
+          homeGoals: previous?.homeGoals ?? null,
+          awayGoals: previous?.awayGoals ?? null,
+        });
+      }
+
+      rotation.splice(1, 0, rotation.pop());
     }
-
-    rotation.splice(1, 0, rotation.pop());
   }
 
   return matches;
@@ -191,6 +341,7 @@ function buildTable(teams, matches) {
   const byId = new Map(table.map((team) => [team.id, team]));
 
   matches.forEach((match) => {
+    if (match.stage) return;
     if (match.homeGoals === null || match.awayGoals === null) return;
     const home = byId.get(match.homeId);
     const away = byId.get(match.awayId);
@@ -228,6 +379,38 @@ function buildTable(teams, matches) {
   );
 }
 
+function getBracketTeams(table) {
+  const qualified = table;
+  return {
+    playIn: [
+      [qualified[6], qualified[9]],
+      [qualified[7], qualified[8]],
+    ],
+    quarterfinals: [
+      [qualified[0], { name: "Vincente 8a vs 9a", placeholder: true }],
+      [qualified[3], qualified[4]],
+      [qualified[1], { name: "Vincente 7a vs 10a", placeholder: true }],
+      [qualified[2], qualified[5]],
+    ],
+  };
+}
+
+function BracketMatchCard({ teams }) {
+  return (
+    <BracketMatch>
+      {teams.map((team, index) => (
+        <BracketTeam
+          key={`${team?.id || team?.name || "empty"}-${index}`}
+          $placeholder={!team || team.placeholder}
+        >
+          <span>{team?.name || "Da definire"}</span>
+          <span>-</span>
+        </BracketTeam>
+      ))}
+    </BracketMatch>
+  );
+}
+
 export default function CoppaCircoPage({
   coppaTeams,
   coppaMatches,
@@ -235,23 +418,28 @@ export default function CoppaCircoPage({
   canManage,
 }) {
   const { message } = AntdApp.useApp();
+  const [mobileTab, setMobileTab] = useState("quarti");
   const [teams, setTeams] = useState(() =>
     coppaTeams?.length === TEAM_COUNT ? coppaTeams : createTeams(),
   );
   const [matches, setMatches] = useState(() => {
-    if (coppaMatches?.length) return coppaMatches;
     const initialTeams =
       coppaTeams?.length === TEAM_COUNT ? coppaTeams : createTeams();
-    return createMatches(initialTeams);
+    return coppaMatches?.length === TEAM_COUNT * (TEAM_COUNT - 1) &&
+      coppaMatches.every((match) => match.matchday)
+      ? coppaMatches
+      : createMatches(initialTeams, coppaMatches || []);
   });
 
   useEffect(() => {
     const nextTeams =
       coppaTeams?.length === TEAM_COUNT ? coppaTeams : createTeams();
     setTeams(nextTeams);
-    const hasMatchdays = coppaMatches?.every((match) => match.matchday);
+    const hasCompleteSchedule =
+      coppaMatches?.length === TEAM_COUNT * (TEAM_COUNT - 1) &&
+      coppaMatches.every((match) => match.matchday);
     setMatches(
-      coppaMatches?.length && hasMatchdays
+      hasCompleteSchedule
         ? coppaMatches
         : createMatches(nextTeams, coppaMatches || []),
     );
@@ -262,8 +450,6 @@ export default function CoppaCircoPage({
     () => new Map(teams.map((team) => [team.id, team])),
     [teams],
   );
-  const completeMatches =
-    matches.length === (TEAM_COUNT * (TEAM_COUNT - 1)) / 2;
   const matchesByMatchday = useMemo(
     () =>
       matches.reduce((groups, match) => {
@@ -274,6 +460,7 @@ export default function CoppaCircoPage({
       }, {}),
     [matches],
   );
+  const bracketTeams = useMemo(() => getBracketTeams(table), [table]);
 
   const updateScore = (id, field, value) => {
     setMatches((current) =>
@@ -290,17 +477,12 @@ export default function CoppaCircoPage({
     );
   };
 
-  const generateMatches = () => {
-    setMatches(createMatches(teams, matches));
-  };
-
   return (
     <div>
       <Head>
         <Title>Coppa Circo</Title>
         {canManage && (
           <Tools>
-            <Button onClick={generateMatches}>Genera calendario</Button>
             <Button type="primary" onClick={save}>
               Salva coppa
             </Button>
@@ -308,8 +490,8 @@ export default function CoppaCircoPage({
         )}
       </Head>
       <Hint>
-        Dieci squadre, girone unico: ogni squadra affronta tutte le altre una
-        volta.
+        Dieci squadre, girone unico di andata e ritorno: ogni squadra affronta
+        tutte le altre due volte, una in casa e una in trasferta.
       </Hint>
 
       <Section>
@@ -351,10 +533,7 @@ export default function CoppaCircoPage({
       </Section>
 
       <Section>
-        <SectionTitle>Giornate ({matches.length}/45 partite)</SectionTitle>
-        {!completeMatches && canManage && (
-          <Button onClick={generateMatches}>Crea le 45 sfide</Button>
-        )}
+        <SectionTitle>Giornate</SectionTitle>
         {Object.entries(matchesByMatchday).map(([matchday, dayMatches]) => (
           <Matchday key={matchday}>
             <MatchdayTitle>Giornata {matchday}</MatchdayTitle>
@@ -395,6 +574,78 @@ export default function CoppaCircoPage({
             ))}
           </Matchday>
         ))}
+      </Section>
+
+      <Section>
+        <SectionTitle>Gara secca</SectionTitle>
+        <Hint>
+          La 7a sfida la 10a e la 8a sfida la 9a. Le due vincitrici completano
+          le otto squadre del tabellone principale.
+        </Hint>
+        <BracketPlayIn>
+          {bracketTeams.playIn.map((teams, index) => (
+            <BracketMatchCard key={`play-in-${index}`} teams={teams} />
+          ))}
+        </BracketPlayIn>
+      </Section>
+
+      <Section>
+        <SectionTitle>Tabellone principale</SectionTitle>
+
+        <MobileBracketNav>
+          <BracketTabButton
+            $active={mobileTab === "quarti"}
+            onClick={() => setMobileTab("quarti")}
+          >
+            Quarti di finale
+          </BracketTabButton>
+          <BracketTabButton
+            $active={mobileTab === "semifinali"}
+            onClick={() => setMobileTab("semifinali")}
+          >
+            Semifinali
+          </BracketTabButton>
+          <BracketTabButton
+            $active={mobileTab === "finale"}
+            onClick={() => setMobileTab("finale")}
+          >
+            Finale
+          </BracketTabButton>
+        </MobileBracketNav>
+
+        <Bracket>
+          {/* QUARTI SX */}
+          <BracketColumn $showMobile={mobileTab === "quarti"}>
+            <BracketColumnTitle>Quarti</BracketColumnTitle>
+            <BracketMatchCard teams={bracketTeams.quarterfinals[0]} />
+            <BracketMatchCard teams={bracketTeams.quarterfinals[1]} />
+          </BracketColumn>
+
+          {/* SEMIFINALE SX */}
+          <BracketColumn $showMobile={mobileTab === "semifinali"}>
+            <BracketColumnTitle>Semifinale 1</BracketColumnTitle>
+            <BracketMatchCard teams={[null, null]} />
+          </BracketColumn>
+
+          {/* FINALE */}
+          <BracketColumn $showMobile={mobileTab === "finale"}>
+            <BracketColumnTitle>Finale</BracketColumnTitle>
+            <BracketMatchCard teams={[null, null]} />
+          </BracketColumn>
+
+          {/* SEMIFINALE DX */}
+          <BracketColumn $showMobile={mobileTab === "semifinali"}>
+            <BracketColumnTitle>Semifinale 2</BracketColumnTitle>
+            <BracketMatchCard teams={[null, null]} />
+          </BracketColumn>
+
+          {/* QUARTI DX */}
+          <BracketColumn $showMobile={mobileTab === "quarti"}>
+            <BracketColumnTitle>Quarti</BracketColumnTitle>
+            <BracketMatchCard teams={bracketTeams.quarterfinals[2]} />
+            <BracketMatchCard teams={bracketTeams.quarterfinals[3]} />
+          </BracketColumn>
+        </Bracket>
       </Section>
     </div>
   );
