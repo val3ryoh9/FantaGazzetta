@@ -1,6 +1,34 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, InputNumber, App as AntdApp } from "antd";
 import { uid } from "../../utils";
+import {
+  Head,
+  BracketMatch,
+  BracketTeam,
+  Title,
+  Tools,
+  Hint,
+  Section,
+  SectionTitle,
+  TableWrap,
+  Table,
+  Th,
+  Td,
+  TeamTd,
+  PtTd,
+  Matchday,
+  MatchdayTitle,
+  Match,
+  Score,
+  ScoreValue,
+  MatchTeam,
+  BracketPlayIn,
+  MobileBracketNav,
+  BracketTabButton,
+  Bracket,
+  BracketColumn,
+  BracketColumnTitle,
+} from "./styled";
 
 export const TEAM_COUNT = 10;
 

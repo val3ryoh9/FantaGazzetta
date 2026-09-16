@@ -3,15 +3,11 @@ export function uid() {
 }
 
 export function fmtDate(iso) {
-  try {
     return new Date(iso).toLocaleDateString('it-IT', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     });
-  } catch (e) {
-    return '';
-  }
 }
 
 // Ridimensiona un file immagine lato client e restituisce una data URL JPEG,
