@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { fmtDate } from '../../utils';
+import { theme } from '../../GlobalStyle'
 
 const Box = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.line};
-  border-top: 3px solid ${({ theme }) => theme.colors.gold};
+  background: ${theme.colors.white};
+  border: 1px solid ${theme.colors.line};
+  border-top: 3px solid ${theme.colors.gold};
   padding-bottom: 30px;
   margin-bottom: 20px;
 `;
@@ -19,9 +20,9 @@ const Inner = styled.div`
 `;
 const BackLink = styled.a`
   font-size: 13px;
-  color: ${({ theme }) => theme.colors.pitch};
+  color: ${theme.colors.pitch};
   font-weight: 600;
-  font-family: ${({ theme }) => theme.fonts.ui};
+  font-family: ${theme.fonts.ui};
   display: inline-block;
   margin-bottom: 14px;
   cursor: pointer;
@@ -29,14 +30,14 @@ const BackLink = styled.a`
 `;
 const Meta = styled.div`
   font-size: 13px;
-  color: ${({ theme }) => theme.colors.inkSoft};
-  font-family: ${({ theme }) => theme.fonts.ui};
+  color: ${theme.colors.inkSoft};
+  font-family: ${theme.fonts.ui};
 `;
 const Title = styled.h1`
   font-size: 30px;
   margin: 4px 0 10px;
-  color: ${({ theme }) => theme.colors.pitchDark};
-  font-family: ${({ theme }) => theme.fonts.serif};
+  color: ${theme.colors.pitchDark};
+  font-family: ${theme.fonts.serif};
 `;
 const BodyText = styled.div`
   font-size: 17px;

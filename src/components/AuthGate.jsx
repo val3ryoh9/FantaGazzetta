@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../supabase/supabaseClient";
 import {
   loginWithUsername,
   saveUsername,
   usernameExists,
-} from "../supabaseApi";
+} from "../supabase/supabaseApi";
+import { theme } from '../GlobalStyle';
 
 const Screen = styled.main`
   min-height: 100vh;
@@ -17,8 +18,8 @@ const Screen = styled.main`
 const Panel = styled.section`
   width: min(100%, 440px);
   padding: 40px;
-  background: ${({ theme }) => theme.colors.paper};
-  border-top: 5px solid ${({ theme }) => theme.colors.gold};
+  background: ${theme.colors.paper};
+  border-top: 5px solid ${theme.colors.gold};
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
   @media (max-width: 520px) {
     padding: 30px 24px;
@@ -26,20 +27,20 @@ const Panel = styled.section`
 `;
 const Kicker = styled.p`
   margin: 0 0 8px;
-  color: ${({ theme }) => theme.colors.goldDeep};
-  font: 700 12px ${({ theme }) => theme.fonts.ui};
+  color: ${theme.colors.goldDeep};
+  font: 700 12px ${theme.fonts.ui};
   letter-spacing: 1.4px;
   text-transform: uppercase;
 `;
 const Title = styled.h1`
   margin: 0;
-  color: ${({ theme }) => theme.colors.pitchDark};
+  color: ${theme.colors.pitchDark};
   font-size: 36px;
   line-height: 1.05;
 `;
 const Intro = styled.p`
   margin: 14px 0 26px;
-  color: ${({ theme }) => theme.colors.inkSoft};
+  color: ${theme.colors.inkSoft};
   font-size: 16px;
   line-height: 1.5;
 `;
@@ -47,11 +48,11 @@ const Field = styled.input`
   width: 100%;
   margin-bottom: 12px;
   padding: 12px 14px;
-  border: 1px solid ${({ theme }) => theme.colors.line};
+  border: 1px solid ${theme.colors.line};
   border-radius: 2px;
-  font: 16px ${({ theme }) => theme.fonts.ui};
+  font: 16px ${theme.fonts.ui};
   &:focus {
-    outline: 2px solid ${({ theme }) => theme.colors.gold};
+    outline: 2px solid ${theme.colors.gold};
   }
 `;
 const Actions = styled.div`
@@ -65,11 +66,11 @@ const Submit = styled.button`
   padding: 13px 16px;
   border: 0;
   border-radius: 2px;
-  background: ${({ $secondary, theme }) =>
+  background: ${({ $secondary }) =>
     $secondary ? theme.colors.pitch : theme.colors.gold};
-  color: ${({ theme }) => theme.colors.paper};
+  color: ${theme.colors.paper};
   cursor: pointer;
-  font: 700 15px ${({ theme }) => theme.fonts.ui};
+  font: 700 15px ${theme.fonts.ui};
   &:disabled {
     cursor: wait;
     opacity: 0.6;
@@ -77,8 +78,8 @@ const Submit = styled.button`
 `;
 const ErrorMessage = styled.p`
   margin: 12px 0 0;
-  color: ${({ theme }) => theme.colors.red};
-  font: 14px ${({ theme }) => theme.fonts.ui};
+  color: ${theme.colors.red};
+  font: 14px ${theme.fonts.ui};
 `;
 
 export default function AuthGate() {

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Button, Popconfirm, Empty } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { fmtDate } from "../../utils";
+import { theme } from '../../GlobalStyle'
 
 const TopGrid = styled.div`
   display: grid;
@@ -21,34 +22,34 @@ const TopImage = styled.img`
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  background: ${({ theme }) => theme.colors.paperDim};
+  background: ${theme.colors.paperDim};
 `;
 const TopPlaceholder = styled.div`
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: ${({ theme }) => theme.colors.paperDim};
+  background: ${theme.colors.paperDim};
 `;
 const TopTitle = styled.h2`
   margin: 10px 0 6px;
-  color: ${({ theme }) => theme.colors.pitchDark};
-  font-family: ${({ theme }) => theme.fonts.serif};
+  color: ${theme.colors.pitchDark};
+  font-family: ${theme.fonts.serif};
   font-size: 22px;
   line-height: 1.15;
 `;
 const Meta = styled.div`
   font-size: 13px;
-  color: ${({ theme }) => theme.colors.inkSoft};
-  font-family: ${({ theme }) => theme.fonts.ui};
+  color: ${theme.colors.inkSoft};
+  font-family: ${theme.fonts.ui};
 `;
 const Excerpt = styled.div`
   font-size: 17px;
   line-height: 1.55;
-  color: ${({ theme }) => theme.colors.ink};
+  color: ${theme.colors.ink};
   margin-top: 10px;
 `;
 const Rule = styled.hr`
   border: none;
-  border-top: 1px solid ${({ theme }) => theme.colors.line};
+  border-top: 1px solid ${theme.colors.line};
   margin: 34px 0;
 `;
 const Row = styled.article`
@@ -66,19 +67,19 @@ const Thumb = styled.img`
   width: 100%;
   aspect-ratio: 1 / 0.82;
   object-fit: cover;
-  background: ${({ theme }) => theme.colors.paperDim};
+  background: ${theme.colors.paperDim};
 `;
 const ThumbPlaceholder = styled.div`
   width: 100%;
   aspect-ratio: 1 / 0.82;
-  background: ${({ theme }) => theme.colors.paperDim};
+  background: ${theme.colors.paperDim};
 `;
 const RowTitle = styled.h2`
   font-size: 19px;
   font-weight: 600;
   line-height: 1.28;
   margin: 0 0 6px;
-  color: ${({ theme }) => theme.colors.pitchDark};
+  color: ${theme.colors.pitchDark};
 
   @media (max-width: 520px) {
     font-size: 16px;

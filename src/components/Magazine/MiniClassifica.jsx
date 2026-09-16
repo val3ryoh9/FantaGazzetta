@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
+import { theme } from '../../GlobalStyle'
 
 const Box = styled.aside`
-  border: 1px solid ${({ theme }) => theme.colors.line};
-  border-top: 3px solid ${({ theme }) => theme.colors.pitch};
-  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${theme.colors.line};
+  border-top: 3px solid ${theme.colors.pitch};
+  background: ${theme.colors.white};
 `;
 const Head = styled.div`
   padding: 14px 16px 10px;
@@ -13,23 +14,23 @@ const Title = styled.h3`
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.pitchDark};
+  color: ${theme.colors.pitchDark};
   letter-spacing: 0.2px;
 `;
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  font-family: ${({ theme }) => theme.fonts.ui};
+  font-family: ${theme.fonts.ui};
 `;
 const Td = styled.td`
   padding: 7px 16px;
   font-size: 13.5px;
-  border-top: 1px solid ${({ theme }) => theme.colors.line};
-  &:first-child { color: ${({ theme }) => theme.colors.inkSoft}; width: 26px; }
-  &:last-child { text-align: right; font-weight: 600; color: ${({ theme }) => theme.colors.pitchDark}; font-variant-numeric: tabular-nums; }
+  border-top: 1px solid ${theme.colors.line};
+  &:first-child { color: ${theme.colors.inkSoft}; width: 26px; }
+  &:last-child { text-align: right; font-weight: 600; color: ${theme.colors.pitchDark}; font-variant-numeric: tabular-nums; }
 `;
 const Empty = styled.td`
-  color: ${({ theme }) => theme.colors.inkSoft};
+  color: ${theme.colors.inkSoft};
   text-align: center;
   padding: 16px;
 `;
@@ -38,7 +39,7 @@ const Foot = styled.div`
 `;
 const FootLink = styled.a`
   font-size: 12.5px;
-  color: ${({ theme }) => theme.colors.pitch};
+  color: ${theme.colors.pitch};
   font-weight: 600;
   cursor: pointer;
   &:hover { text-decoration: underline; }

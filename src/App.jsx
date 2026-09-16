@@ -5,7 +5,7 @@ import MagazinePage from "./components/Magazine/MagazinePage";
 import CoppaCircoPage from "./components/Coppa/CoppaCircoPage";
 import AuthGate from "./components/AuthGate";
 import LeagueGate from "./components/LeagueGate";
-import { supabase } from "./supabaseClient";
+import { supabase } from "./supabase/supabaseClient";
 import {
   getLeagues,
   getCurrentProfile,
@@ -14,7 +14,8 @@ import {
   loadLeagueData,
   saveLeagueData,
   signOut,
-} from "./supabaseApi";
+} from "./supabase/supabaseApi";
+import { theme } from './GlobalStyle'
 
 const SELECTED_LEAGUE_KEY = "Fantagazzetta_selected_league";
 const LAST_PAGE_KEY = "Fantagazzetta_last_page";
@@ -28,13 +29,13 @@ const LoadingScreen = styled.main`
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: ${({ theme }) => theme.colors.paper};
+  background: ${theme.colors.paper};
 `;
 const Spinner = styled.div`
   width: 42px;
   height: 42px;
-  border: 4px solid ${({ theme }) => theme.colors.line};
-  border-top-color: ${({ theme }) => theme.colors.gold};
+  border: 4px solid ${theme.colors.line};
+  border-top-color: ${theme.colors.gold};
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 

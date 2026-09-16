@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Input, InputNumber, Button, Popconfirm, App as AntdApp } from "antd";
+import { InputNumber, Button, Popconfirm, App as AntdApp } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { uid } from "../../utils";
+import { theme } from '../../GlobalStyle'
 
 const Head = styled.div`
   display: flex;
@@ -13,10 +14,10 @@ const Head = styled.div`
   gap: 10px;
 `;
 const Title = styled.h1`
-  font-family: ${({ theme }) => theme.fonts.serif};
+  font-family: ${theme.fonts.serif};
   font-size: 28px;
   margin: 0;
-  color: ${({ theme }) => theme.colors.pitchDark};
+  color: ${theme.colors.pitchDark};
 `;
 const Tools = styled.div`
   display: flex;
@@ -28,13 +29,13 @@ const TableWrap = styled.div`
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  font-family: ${({ theme }) => theme.fonts.ui};
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.line};
+  font-family: ${theme.fonts.ui};
+  background: ${theme.colors.white};
+  border: 1px solid ${theme.colors.line};
 `;
 const Th = styled.th`
-  background: ${({ theme }) => theme.colors.pitchDark};
-  color: ${({ theme }) => theme.colors.paper};
+  background: ${theme.colors.pitchDark};
+  color: ${theme.colors.paper};
   font-size: 12px;
   font-weight: 500;
   padding: 10px 8px;
@@ -48,7 +49,7 @@ const Th = styled.th`
 const Td = styled.td`
   padding: 7px 8px;
   text-align: center;
-  border-top: 1px solid ${({ theme }) => theme.colors.line};
+  border-top: 1px solid ${theme.colors.line};
   font-size: 14px;
   font-variant-numeric: tabular-nums;
 `;
@@ -56,19 +57,19 @@ const TeamTd = styled(Td)`
   text-align: left;
   padding-left: 14px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.pitchDark};
-  font-family: ${({ theme }) => theme.fonts.serif};
+  color: ${theme.colors.pitchDark};
+  font-family: ${theme.fonts.serif};
   font-size: 15px;
 `;
 const PtTd = styled(Td)`
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.goldDeep};
+  color: ${theme.colors.goldDeep};
   background: rgba(199, 154, 61, 0.08);
 `;
 const Hint = styled.p`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.inkSoft};
-  font-family: ${({ theme }) => theme.fonts.ui};
+  color: ${theme.colors.inkSoft};
+  font-family: ${theme.fonts.ui};
   margin-top: 16px;
 `;
 

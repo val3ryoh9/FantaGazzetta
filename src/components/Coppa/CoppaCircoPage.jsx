@@ -1,298 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
-import styled, { keyframes, css } from "styled-components";
 import { Button, InputNumber, App as AntdApp } from "antd";
 import { uid } from "../../utils";
 
-const fadeInSlide = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-`;
+export const TEAM_COUNT = 10;
 
-const Head = styled.div`
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-  gap: 10px;
-`;
-const Title = styled.h1`
-  font-family: ${({ theme }) => theme.fonts.serif};
-  font-size: 28px;
-  margin: 0;
-  color: ${({ theme }) => theme.colors.pitchDark};
-`;
-const Tools = styled.div`
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-`;
-const Section = styled.section`
-  margin-top: 26px;
-`;
-const SectionTitle = styled.h2`
-  margin: 0 0 12px;
-  color: ${({ theme }) => theme.colors.pitchDark};
-  font-family: ${({ theme }) => theme.fonts.serif};
-  font-size: 21px;
-`;
-const Matchday = styled.div`
-  margin-bottom: 22px;
-  border: 1px solid ${({ theme }) => theme.colors.line};
-  background: ${({ theme }) => theme.colors.white};
-`;
-const MatchdayTitle = styled.h3`
-  margin: 0;
-  padding: 10px 12px;
-  background: ${({ theme }) => theme.colors.pitchDark};
-  color: ${({ theme }) => theme.colors.paper};
-  font: 600 14px ${({ theme }) => theme.fonts.ui};
-`;
-const TableWrap = styled.div`
-  overflow-x: auto;
-`;
-const Table = styled.table`
-  width: 100%;
-  min-width: 650px;
-  border-collapse: collapse;
-  font-family: ${({ theme }) => theme.fonts.ui};
-  background: ${({ theme }) => theme.colors.white};
-  border: 1px solid ${({ theme }) => theme.colors.line};
-`;
-const Th = styled.th`
-  background: ${({ theme }) => theme.colors.pitchDark};
-  color: ${({ theme }) => theme.colors.paper};
-  font-size: 12px;
-  font-weight: 500;
-  padding: 10px 8px;
-  text-align: center;
-  &:nth-child(2) {
-    text-align: left;
-    padding-left: 14px;
-  }
-`;
-const Td = styled.td`
-  padding: 7px 8px;
-  text-align: center;
-  border-top: 1px solid ${({ theme }) => theme.colors.line};
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-`;
-const TeamTd = styled(Td)`
-  text-align: left;
-  padding-left: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.pitchDark};
-  font-family: ${({ theme }) => theme.fonts.serif};
-  font-size: 15px;
-`;
-const PtTd = styled(Td)`
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.goldDeep};
-  background: rgba(199, 154, 61, 0.08);
-`;
-
-/* MATCH & LAYOUT FIX PER IL TESTO LUNGO */
-const Match = styled.div`
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 8px;
-  border-top: 1px solid ${({ theme }) => theme.colors.line};
-  background: ${({ theme }) => theme.colors.white};
-  font-family: ${({ theme }) => theme.fonts.ui};
-
-  @media (max-width: 480px) {
-    padding: 8px 6px;
-    gap: 4px;
-  }
-`;
-
-const MatchTeam = styled.span`
-  text-align: ${({ $away }) => ($away ? "left" : "right")};
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 1.2;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-
-  @media (max-width: 480px) {
-    font-size: 11px;
-  }
-`;
-
-const Score = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-
-  /* Ridimensiona gli InputNumber di Antd su schermi piccoli */
-  .ant-input-number {
-    width: 36px !important;
-
-    @media (max-width: 480px) {
-      width: 30px !important;
-    }
-  }
-
-  .ant-input-number-input {
-    padding: 0 2px !important;
-    text-align: center;
-    font-size: 13px;
-
-    @media (max-width: 480px) {
-      font-size: 11px;
-    }
-  }
-
-  .ant-input-number-handler-wrap {
-    display: none; /* Nasconde le freccette per guadagnare spazio su mobile */
-  }
-`;
-
-const ScoreValue = styled.span`
-  width: 28px;
-  padding: 4px 0;
-  border: 1px solid ${({ theme }) => theme.colors.line};
-  border-radius: 2px;
-  color: ${({ theme }) => theme.colors.ink};
-  text-align: center;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-  pointer-events: none;
-
-  @media (max-width: 480px) {
-    width: 22px;
-    font-size: 11px;
-  }
-`;
-
-const Hint = styled.p`
-  color: ${({ theme }) => theme.colors.inkSoft};
-  font: 12px ${({ theme }) => theme.fonts.ui};
-  margin: 12px 0 0;
-`;
-const Bracket = styled.div`
-  display: grid;
-  grid-template-columns: repeat(5, minmax(180px, 1fr));
-  gap: 16px;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-`;
-const MobileBracketNav = styled.div`
-  display: none;
-
-  @media (max-width: 768px) {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-`;
-const BracketTabButton = styled.button`
-  background: ${({ $active, theme }) =>
-    $active ? theme.colors.pitchDark : theme.colors.paper};
-  color: ${({ $active, theme }) =>
-    $active ? theme.colors.paper : theme.colors.pitchDark};
-  border: 1px solid ${({ theme }) => theme.colors.line};
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: ${({ $active }) =>
-    $active ? "0 2px 8px rgba(0, 0, 0, 0.15)" : "none"};
-
-  &:active {
-    transform: scale(0.95);
-  }
-`;
-
-const BracketPlayIn = styled.div`
-  display: grid;
-  margin-top: 16px;
-  grid-template-columns: repeat(2, minmax(190px, 1fr));
-  gap: 16px;
-  overflow-x: auto;
-
-  @media (max-width: 760px) {
-    grid-template-columns: repeat(2, 220px);
-  }
-`;
-const BracketColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 24px;
-
-  @media (max-width: 768px) {
-    display: ${({ $showMobile }) => ($showMobile ? "flex" : "none")};
-    gap: 12px;
-    width: 100%;
-    ${({ $showMobile }) =>
-      $showMobile &&
-      css`
-        animation: ${fadeInSlide} 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      `}
-  }
-`;
-const BracketColumnTitle = styled.h3`
-  margin: 0 0 4px;
-  color: ${({ theme }) => theme.colors.pitchDark};
-  font: 600 14px ${({ theme }) => theme.fonts.ui};
-  text-align: center;
-`;
-const BracketMatch = styled.div`
-  padding: 10px 12px;
-  border: 1px solid ${({ theme }) => theme.colors.line};
-  border-radius: 4px;
-  background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0 4px 12px rgba(22, 48, 42, 0.06);
-`;
-const BracketTeam = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 5px 0;
-  color: ${({ $placeholder, theme }) =>
-    $placeholder ? theme.colors.inkSoft : theme.colors.pitchDark};
-  font: 600 13px ${({ theme }) => theme.fonts.ui};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.paperDim};
-  &:last-child {
-    border-bottom: 0;
-  }
-`;
-
-const TEAM_COUNT = 10;
-
-function createTeams() {
+export function createTeams() {
   return Array.from({ length: TEAM_COUNT }, (_, index) => ({
     id: uid(),
     name: `Squadra ${index + 1}`,
   }));
 }
 
-function createMatches(teams, previousMatches = []) {
+export function createMatches(teams, previousMatches = []) {
   const previousByDirection = new Map(
     previousMatches.map((match) => [`${match.homeId}:${match.awayId}`, match]),
   );
@@ -327,7 +46,7 @@ function createMatches(teams, previousMatches = []) {
   return matches;
 }
 
-function buildTable(teams, matches) {
+export function buildTable(teams, matches) {
   const table = teams.map((team) => ({
     ...team,
     played: 0,
@@ -379,7 +98,7 @@ function buildTable(teams, matches) {
   );
 }
 
-function getBracketTeams(table) {
+export function getBracketTeams(table) {
   const qualified = table;
   return {
     playIn: [
@@ -395,7 +114,7 @@ function getBracketTeams(table) {
   };
 }
 
-function BracketMatchCard({ teams }) {
+export function BracketMatchCard({ teams }) {
   return (
     <BracketMatch>
       {teams.map((team, index) => (

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { theme } from '../GlobalStyle';
+
 
 const Bar = styled.header`
   position: sticky;
   top: 0;
   z-index: 40;
-  background: ${({ theme }) => theme.colors.pitchDark};
-  border-bottom: 3px solid ${({ theme }) => theme.colors.gold};
+  background: ${theme.colors.pitchDark};
+  border-bottom: 3px solid ${theme.colors.gold};
 `;
 
 const Inner = styled.div`
@@ -24,13 +26,13 @@ const Inner = styled.div`
 `;
 
 const Wordmark = styled.div`
-  font-family: ${({ theme }) => theme.fonts.display};
-  color: ${({ theme }) => theme.colors.paper};
+  font-family: ${theme.fonts.display};
+  color: ${theme.colors.paper};
   font-weight: 700;
   font-size: 26px;
   letter-spacing: 0.3px;
   span {
-    color: ${({ theme }) => theme.colors.gold};
+    color: ${theme.colors.gold};
   }
 `;
 
@@ -45,17 +47,17 @@ const Nav = styled.nav`
     top: 100%;
     left: 0;
     right: 0;
-    background: ${({ theme }) => theme.colors.pitchDark};
+    background: ${theme.colors.pitchDark};
     flex-direction: column;
     padding: 8px 20px 16px;
-    border-bottom: 3px solid ${({ theme }) => theme.colors.gold};
+    border-bottom: 3px solid ${theme.colors.gold};
   }
 `;
 
 const CurrentLeague = styled.div`
   min-width: 0;
-  color: ${({ theme }) => theme.colors.gold};
-  font-family: ${({ theme }) => theme.fonts.display};
+  color: ${theme.colors.gold};
+  font-family: ${theme.fonts.display};
   font-size: 17px;
   font-weight: 600;
   text-align: center;
@@ -69,8 +71,8 @@ const CurrentLeague = styled.div`
 `;
 
 const NavLink = styled.a`
-  font-family: ${({ theme }) => theme.fonts.display};
-  color: ${({ $active, $exit, theme }) => {
+  font-family: ${theme.fonts.display};
+  color: ${({ $active, $exit }) => {
     if ($exit) return theme.colors.red;
     if ($active) {
       return theme.colors.paper;
@@ -82,13 +84,13 @@ const NavLink = styled.a`
   font-weight: 500;
   padding: 8px 14px;
   border-bottom: 2px solid
-    ${({ $active, theme }) => ($active ? theme.colors.gold : "transparent")};
+    ${({ $active }) => ($active ? theme.colors.gold : "transparent")};
   cursor: pointer;
   transition:
     color 0.15s ease,
     border-color 0.15s ease;
   &:hover {
-    color: ${({ $exit, theme }) => ($exit ? "#BA3D2B" : theme.colors.paper)};
+    color: ${({ $exit }) => ($exit ? "#BA3D2B" : theme.colors.paper)};
   }
 `;
 
@@ -96,10 +98,10 @@ const Toggle = styled.button`
   display: none;
   background: none;
   border: 1px solid rgba(244, 241, 230, 0.4);
-  color: ${({ theme }) => theme.colors.paper};
+  color: ${theme.colors.paper};
   padding: 6px 10px;
   border-radius: 3px;
-  font-family: ${({ theme }) => theme.fonts.ui};
+  font-family: ${theme.fonts.ui};
 
   @media (max-width: 880px) {
     display: block;
