@@ -69,6 +69,8 @@ export default function App() {
       appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
       allowLocalhostAsSecureOrigin: true,
       notifyButton: { enable: false },
+      serviceWorkerPath: "sw.js",
+      serviceWorkerParam: { scope: "/" },
     });
   }, []);
 
@@ -166,7 +168,7 @@ export default function App() {
   const notifyLeague = async ({ title, message }) => {
     if (!league || !session?.access_token) return;
     try {
-      await fetch("/api/notify-league", {
+      const response = await fetch("/api/notify-league", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -174,8 +176,13 @@ export default function App() {
         },
         body: JSON.stringify({ leagueId: league.id, title, message }),
       });
-    } catch {
+      if (!response.ok) {
+        const result = await response.json().catch(() => null);
+        console.error("Invio notifica fallito:", response.status, result);
+      }
+    } catch (notifyError) {
       // la notifica è un extra, un fallimento qui non deve bloccare la pubblicazione
+      console.error("Invio notifica fallito:", notifyError);
     }
   };
 

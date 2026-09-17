@@ -7,6 +7,9 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.js",
       includeAssets: ["favicon.ico", "apple-touch-icon.png"],
       manifest: {
         name: "FantaGazzetta",
@@ -27,15 +30,8 @@ export default defineConfig({
           },
         ],
       },
-      workbox: {
+      injectManifest: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/,
-            handler: "NetworkFirst",
-            options: { cacheName: "supabase-api", networkTimeoutSeconds: 5 },
-          },
-        ],
       },
     }),
   ],

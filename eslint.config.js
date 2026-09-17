@@ -28,6 +28,16 @@ export default defineConfig([
     },
   },
 
+  {
+    files: ["src/sw.js", "api/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker,
+        ...globals.node,
+      },
+    },
+  },
+
   tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
 ]);
