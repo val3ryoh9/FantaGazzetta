@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import OneSignal from "react-onesignal";
 import Header from "./components/Header";
 import MagazinePage from "./components/Magazine/MagazinePage";
 import CoppaCircoPage from "./components/Coppa/CoppaCircoPage";
@@ -15,7 +16,7 @@ import {
   saveLeagueData,
   signOut,
 } from "./supabase/supabaseApi";
-import { theme } from './GlobalStyle'
+import { theme } from "./GlobalStyle";
 
 const SELECTED_LEAGUE_KEY = "Fantagazzetta_selected_league";
 const LAST_PAGE_KEY = "Fantagazzetta_last_page";
@@ -62,6 +63,15 @@ export default function App() {
   const [isGlobalAdmin, setIsGlobalAdmin] = useState(false);
   const [isRestoring, setIsRestoring] = useState(true);
 
+  // Inizializzazione OneSignal (una tantum al mount)
+  useEffect(() => {
+    OneSignal.init({
+      appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+      allowLocalhostAsSecureOrigin: true,
+      notifyButton: { enable: false },
+    });
+  }, []);
+
   useEffect(() => {
     if (!supabase) {
       setSession(null);
@@ -71,7 +81,11 @@ export default function App() {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
     const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
-      if (!nextSession) {
+
+      if (nextSession?.user?.id) {
+        OneSignal.login(nextSession.user.id);
+      } else {
+        OneSignal.logout();
         setLeague(null);
         setRole(null);
         setIsGlobalAdmin(false);
@@ -105,6 +119,7 @@ export default function App() {
           const savedPage = sessionStorage.getItem(LAST_PAGE_KEY);
           setPage(savedPage === "coppaCirco" ? savedPage : "magazine");
           setLeague(savedLeague);
+          OneSignal.User.addTag(`league_${savedLeague.id}`, "1");
         } catch {
           sessionStorage.removeItem(SELECTED_LEAGUE_KEY);
           sessionStorage.removeItem(LAST_PAGE_KEY);
@@ -142,6 +157,26 @@ export default function App() {
     setPage(savedPage === "coppaCirco" ? savedPage : "magazine");
     setLeague(nextLeague);
     sessionStorage.setItem(SELECTED_LEAGUE_KEY, nextLeague.id);
+    OneSignal.User.addTag(`league_${nextLeague.id}`, "1");
+
+    // Chiedi il permesso notifiche dopo che l'utente è entrato in una lega
+    OneSignal.Notifications.requestPermission();
+  };
+
+  const notifyLeague = async ({ title, message }) => {
+    if (!league || !session?.access_token) return;
+    try {
+      await fetch("/api/notify-league", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ leagueId: league.id, title, message }),
+      });
+    } catch {
+      // la notifica è un extra, un fallimento qui non deve bloccare la pubblicazione
+    }
   };
 
   const exitLeague = () => {
@@ -178,8 +213,17 @@ export default function App() {
   };
 
   const saveArticles = async (next) => {
+    const publishedArticle =
+      next.length > articles.length ? next[0] : null;
     setArticles(next);
-    return updateLeagueData({ articles: next, rosters, standings });
+    const ok = await updateLeagueData({ articles: next, rosters, standings });
+    if (ok && publishedArticle) {
+      notifyLeague({
+        title: "Nuovo articolo",
+        message: publishedArticle.title,
+      });
+    }
+    return ok;
   };
   const saveCoppa = async ({ teams, matches }) => {
     setCoppaTeams(teams);
