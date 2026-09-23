@@ -80,3 +80,18 @@ export const clearSavedAccess = () => {
     // storage non disponibile: niente da pulire
   }
 };
+
+// La pagina aperta arriva dalla cache del vecchio service worker: quando il
+// nuovo (skipWaiting + clients.claim in sw.js) prende il controllo, ricarica
+// per mostrare subito la versione appena pubblicata.
+export const reloadOnServiceWorkerUpdate = () => {
+  if (!("serviceWorker" in navigator)) return;
+  // al primo accesso non c'è un controller: la pagina è già aggiornata
+  if (!navigator.serviceWorker.controller) return;
+  let reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloading) return;
+    reloading = true;
+    window.location.reload();
+  });
+};

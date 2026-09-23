@@ -5,6 +5,9 @@ import { ThemeProvider } from 'styled-components';
 import 'antd/dist/reset.css';
 import GlobalStyle, { theme, antdTheme } from './GlobalStyle';
 import { App } from './App/App';
+import { reloadOnServiceWorkerUpdate } from './utils/utils';
+
+reloadOnServiceWorkerUpdate();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
