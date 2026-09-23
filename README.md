@@ -23,24 +23,32 @@ npm run preview
 ```
 src/
   main.jsx                     -> ConfigProvider antd + ThemeProvider styled-components
-  App.jsx                      -> stato globale, caricamento/salvataggio, routing tra pagine
-  theme.js                     -> palette e token condivisi (pitch green + oro editoriale)
-  GlobalStyle.js                -> font Google e reset base
-  utils.js                     -> id, formattazione date, ridimensionamento immagini, helper localStorage
+  GlobalStyle.js               -> reset base, theme e tema antd
   seedData.js                  -> contenuti di esempio al primo avvio
+  utils/utils.js               -> helper condivisi: id, date, ridimensionamento immagini, localStorage
+  App/
+    App.jsx                    -> stato globale, caricamento/salvataggio, routing tra pagine
+    styled.js / utils.js       -> styled components e funzioni di App
   components/
-    Header.jsx                 -> nav sticky con wordmark
+    AuthGate/                  -> registrazione/accesso con nome utente
+    LeagueGate/                -> scelta della lega
+    Header/                    -> nav sticky con wordmark
     Magazine/
-      MagazinePage.jsx         -> orchestratore della sezione magazine
-      ArticleComposer.jsx      -> form "Scrivi un articolo" (antd Form + Upload)
-      ArticleList.jsx          -> pezzo in evidenza + elenco articoli
-      ArticleDetail.jsx        -> pagina di lettura articolo
-      MiniClassifica.jsx       -> classifica ridotta in sidebar (e link alla pagina completa)
-    Rose/
-      RosePage.jsx             -> card per squadra con giocatori modificabili
+      MagazinePage/            -> orchestratore della sezione magazine
+      ArticleComposer/         -> form "Scrivi un articolo" (antd Form + Upload)
+      ArticleList/             -> pezzi in evidenza + elenco articoli (+ DeleteButton.jsx)
+      ArticleDetail/           -> pagina di lettura articolo
+      MiniClassifica/          -> classifica ridotta
     Classifica/
-      ClassificaPage.jsx       -> tabella classifica completa e modificabile
+      ClassificaPage/          -> tabella classifica completa e modificabile
+    Coppa/
+      CoppaCircoPage/          -> girone e tabellone Coppa Circo (+ BracketMatchCard.jsx)
 ```
+
+Convenzione: ogni componente ha la sua cartella con `<Componente>.jsx`, `styled.js`
+(styled components) e `utils.js` (funzioni e costanti). I sotto-componenti usati
+da un componente stanno nella stessa cartella in un file con il loro nome.
+Tutti i componenti e le funzioni sono esportati come `export const Nome = () => {}`.
 
 ## Backend, autenticazione e ruoli
 
@@ -59,5 +67,5 @@ Il file `.env` non va committato: contiene la configurazione specifica del proge
 
 ## Personalizzazione
 
-- Colori e font: `src/theme.js` (usato sia da styled-components sia dal tema antd via `ConfigProvider`).
+- Colori e font: `src/GlobalStyle.js` (usato sia da styled-components sia dal tema antd via `ConfigProvider`).
 - Nomi delle squadre di esempio: `src/seedData.js`.

@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      // sw.js lo registra OneSignal (serviceWorkerPath in App.jsx): una
+      // sw.js lo registra OneSignal (serviceWorkerPath in App/utils.js): una
       // seconda registrazione senza i suoi parametri lo sovrascriverebbe
       injectRegister: false,
       strategies: "injectManifest",
