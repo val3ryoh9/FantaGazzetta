@@ -5,6 +5,7 @@ import {
   saveUsername,
   usernameExists,
 } from "../../supabase/supabaseApi";
+import { saveSavedAccess } from "../../utils/utils";
 import {
   Screen,
   Panel,
@@ -49,10 +50,10 @@ export const AuthGate = () => {
     setBusy(true);
     setError("");
     try {
-      sessionStorage.setItem(
-        "Fantagazzetta_auth_mode",
-        mode === "register" ? "register" : "login",
-      );
+      saveSavedAccess({
+        authMode: mode === "register" ? "register" : "login",
+        username: name,
+      });
       if (mode === "register") {
         const alreadyUsed = await usernameExists(name);
         if (alreadyUsed) throw new Error("Questo nome utente è già in uso.");

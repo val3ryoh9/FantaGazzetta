@@ -53,3 +53,30 @@ export const saveLS = (key, value) => {
     return false;
   }
 };
+
+// Accesso ricordato: lega, pagina e modalità di login restano validi per
+// SAVED_ACCESS_TTL_MS dall'ultimo utilizzo; scaduti si torna al login.
+export const SAVED_ACCESS_TTL_MS = 30 * 60 * 1000;
+const SAVED_ACCESS_KEY = "Fantagazzetta_saved_access";
+
+export const loadSavedAccess = () => {
+  const saved = loadLS(SAVED_ACCESS_KEY, null);
+  if (!saved?.lastAccess) return null;
+  if (Date.now() - saved.lastAccess > SAVED_ACCESS_TTL_MS) return null;
+  return saved;
+};
+
+export const saveSavedAccess = (patch = {}) =>
+  saveLS(SAVED_ACCESS_KEY, {
+    ...(loadSavedAccess() || {}),
+    ...patch,
+    lastAccess: Date.now(),
+  });
+
+export const clearSavedAccess = () => {
+  try {
+    localStorage.removeItem(SAVED_ACCESS_KEY);
+  } catch {
+    // storage non disponibile: niente da pulire
+  }
+};

@@ -26,7 +26,7 @@ export const getCurrentProfile = async () => {
 
   const { data, error } = await requireClient()
     .from("profiles")
-    .select("is_admin")
+    .select("username, is_admin")
     .eq("id", userData.user.id)
     .maybeSingle();
   if (error) throw error;

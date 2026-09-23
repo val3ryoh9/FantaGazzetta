@@ -1,7 +1,5 @@
 import OneSignal from "react-onesignal";
-
-export const SELECTED_LEAGUE_KEY = "Fantagazzetta_selected_league";
-export const LAST_PAGE_KEY = "Fantagazzetta_last_page";
+import { loadSavedAccess, saveSavedAccess } from "../utils/utils";
 
 // react-onesignal esegue le chiamate appena lo script è caricato, senza
 // aspettare la fine di init: ogni chiamata deve passare da oneSignalReady
@@ -17,18 +15,15 @@ export const oneSignalReady = OneSignal.init({
 });
 
 export const getRequiresPassword = (isGlobalAdmin) =>
-  !isGlobalAdmin &&
-  sessionStorage.getItem("Fantagazzetta_auth_mode") !== "login";
+  !isGlobalAdmin && loadSavedAccess()?.authMode !== "login";
 
-export const getSavedPage = () => {
-  const savedPage = sessionStorage.getItem(LAST_PAGE_KEY);
-  return savedPage === "coppaCirco" ? savedPage : "magazine";
-};
+export const getSavedLeagueId = () => loadSavedAccess()?.leagueId || null;
 
-export const clearSavedNavigation = () => {
-  sessionStorage.removeItem(SELECTED_LEAGUE_KEY);
-  sessionStorage.removeItem(LAST_PAGE_KEY);
-};
+export const getSavedPage = () =>
+  loadSavedAccess()?.page === "coppaCirco" ? "coppaCirco" : "magazine";
+
+export const clearSavedNavigation = () =>
+  saveSavedAccess({ leagueId: null, page: null });
 
 export const getMembership = (result) =>
   Array.isArray(result) ? result[0] : result;

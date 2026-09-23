@@ -20,6 +20,7 @@ export const Inner = styled.div`
 
   @media (max-width: 880px) {
     grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 6px;
   }
 `;
 
@@ -63,8 +64,12 @@ export const CurrentLeague = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
 
+  /* su mobile va su una riga sua sotto logo e Menu */
   @media (max-width: 880px) {
-    display: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 15px;
+    text-align: left;
   }
 `;
 

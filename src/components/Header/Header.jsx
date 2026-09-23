@@ -10,8 +10,17 @@ import {
 } from "./styled";
 import { PAGES } from "./utils";
 
-export const Header = ({ page, onNavigate, onExit, currentLeague }) => {
+export const Header = ({
+  page,
+  onNavigate,
+  onExit,
+  currentLeague,
+  username,
+}) => {
   const [open, setOpen] = useState(false);
+  const welcome = username
+    ? `Benvenuto ${username} - ${currentLeague}`
+    : currentLeague;
 
   return (
     <Bar>
@@ -19,7 +28,7 @@ export const Header = ({ page, onNavigate, onExit, currentLeague }) => {
         <Wordmark>
           Fanta<span>Gazzetta</span>
         </Wordmark>
-        <CurrentLeague title={currentLeague}>{currentLeague}</CurrentLeague>
+        <CurrentLeague title={welcome}>{welcome}</CurrentLeague>
         <Toggle onClick={() => setOpen((o) => !o)}>Menu</Toggle>
         <Nav $open={open}>
           {PAGES.map((p) => (

@@ -15,12 +15,16 @@ import {
   saveLeagueData,
   signOut,
 } from "../supabase/supabaseApi";
+import {
+  loadSavedAccess,
+  saveSavedAccess,
+  clearSavedAccess,
+} from "../utils/utils";
 import { Main, LoadingScreen, Spinner } from "./styled";
 import {
-  SELECTED_LEAGUE_KEY,
-  LAST_PAGE_KEY,
   oneSignalReady,
   getRequiresPassword,
+  getSavedLeagueId,
   getSavedPage,
   clearSavedNavigation,
   getMembership,
@@ -41,6 +45,7 @@ export const App = () => {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const [isGlobalAdmin, setIsGlobalAdmin] = useState(false);
+  const [username, setUsername] = useState("");
   const [isRestoring, setIsRestoring] = useState(true);
 
   useEffect(() => {
@@ -49,8 +54,15 @@ export const App = () => {
       return undefined;
     }
 
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      // All'apertura del sito la sessione Supabase vale solo se l'ultimo
+      // accesso è dentro SAVED_ACCESS_TTL_MS, altrimenti si torna al login
+      if (event === "INITIAL_SESSION" && nextSession && !loadSavedAccess()) {
+        setSession(null);
+        // signOut fuori dal callback: chiamarlo qui dentro blocca supabase-js
+        setTimeout(() => supabase.auth.signOut(), 0);
+        return;
+      }
       setSession(nextSession);
 
       if (!nextSession?.user?.id) {
@@ -58,8 +70,9 @@ export const App = () => {
         setLeague(null);
         setRole(null);
         setIsGlobalAdmin(false);
+        setUsername("");
         setReady(false);
-        clearSavedNavigation();
+        clearSavedAccess();
       }
     });
     return () => data.subscription.unsubscribe();
@@ -73,8 +86,11 @@ export const App = () => {
         setLeagues(availableLeagues);
         const globalAdmin = Boolean(profile?.is_admin);
         setIsGlobalAdmin(globalAdmin);
+        // chi accede con un nome già registrato non ha un profilo proprio:
+        // il nome arriva da quello salvato al login
+        setUsername(profile?.username || loadSavedAccess()?.username || "");
 
-        const savedLeagueId = sessionStorage.getItem(SELECTED_LEAGUE_KEY);
+        const savedLeagueId = getSavedLeagueId();
         const savedLeague = availableLeagues.find(
           (availableLeague) => availableLeague.id === savedLeagueId,
         );
@@ -87,6 +103,7 @@ export const App = () => {
           setRole(globalAdmin ? "admin" : membership.role);
           setPage(getSavedPage());
           setLeague(savedLeague);
+          saveSavedAccess();
         } catch {
           clearSavedNavigation();
         }
@@ -127,7 +144,7 @@ export const App = () => {
     setRole(getMembership(result).role);
     setPage(getSavedPage());
     setLeague(nextLeague);
-    sessionStorage.setItem(SELECTED_LEAGUE_KEY, nextLeague.id);
+    saveSavedAccess({ leagueId: nextLeague.id });
 
     // Chiedi il permesso notifiche dopo che l'utente è entrato in una lega
     oneSignalReady
@@ -146,7 +163,7 @@ export const App = () => {
 
   const navigate = (nextPage) => {
     setPage(nextPage);
-    sessionStorage.setItem(LAST_PAGE_KEY, nextPage);
+    saveSavedAccess({ page: nextPage });
   };
 
   const updateLeagueData = async (nextData) => {
@@ -203,7 +220,7 @@ export const App = () => {
         onSelect={enterLeague}
         onExit={signOut}
         requiresPassword={getRequiresPassword(isGlobalAdmin)}
-        initialLeagueId={sessionStorage.getItem(SELECTED_LEAGUE_KEY)}
+        initialLeagueId={getSavedLeagueId()}
       />
     );
   if (!ready) return null;
@@ -218,6 +235,7 @@ export const App = () => {
         onExit={exitLeague}
         onSignOut={signOut}
         currentLeague={league.name}
+        username={username}
       />
       {error && <p role="alert">{error}</p>}
       <Main>
