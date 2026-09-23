@@ -4,7 +4,7 @@ import { ConfigProvider, App as AntApp } from 'antd';
 import { ThemeProvider } from 'styled-components';
 import 'antd/dist/reset.css';
 import GlobalStyle, { theme, antdTheme } from './GlobalStyle';
-import App from './App';
+import { App } from './App/App';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

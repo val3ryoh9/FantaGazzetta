@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import ArticleComposer from "./ArticleComposer";
-import ArticleList from "./ArticleList";
-import ArticleDetail from "./ArticleDetail";
+import { ArticleComposer } from "../ArticleComposer/ArticleComposer";
+import { ArticleList } from "../ArticleList/ArticleList";
+import { ArticleDetail } from "../ArticleDetail/ArticleDetail";
 
-export default function MagazinePage({ articles, onSaveArticles, canManage }) {
+export const MagazinePage = ({ articles, onSaveArticles, canManage }) => {
   const [selectedId, setSelectedId] = useState(null);
 
   const handleDelete = (id) => {
@@ -33,4 +33,4 @@ export default function MagazinePage({ articles, onSaveArticles, canManage }) {
       )}
     </div>
   );
-}
+};

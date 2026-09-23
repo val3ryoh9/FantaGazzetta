@@ -1,57 +1,17 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import { Form, Input, Button, Upload, App as AntdApp } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
-import { uid, resizeImage } from "../../utils";
-import { theme } from '../../GlobalStyle'
+import { resizeImage } from "../../../utils/utils";
+import {
+  Wrap,
+  ToggleBtn,
+  Panel,
+  PanelTitle,
+  Preview,
+} from "./styled";
+import { createArticle } from "./utils";
 
-const Wrap = styled.div`
-  margin-bottom: 26px;
-`;
-
-const ToggleBtn = styled(Button)`
-  && {
-    background: ${theme.colors.pitch};
-    border-color: ${theme.colors.pitch};
-    color: ${theme.colors.paper};
-    font-family: ${theme.fonts.display};
-    font-weight: 600;
-    height: auto;
-    padding: 9px 18px;
-    &:hover {
-      background: ${theme.colors.pitchDark} !important;
-      color: ${theme.colors.paper} !important;
-    }
-  }
-`;
-
-const Panel = styled.div`
-  margin-top: 14px;
-  background: ${theme.colors.white};
-  border: 1px solid ${theme.colors.line};
-  border-top: 3px solid ${theme.colors.gold};
-  padding: 22px;
-`;
-
-const PanelTitle = styled.h3`
-  margin: 0 0 16px;
-  font-size: 20px;
-  font-weight: 600;
-  color: ${theme.colors.pitchDark};
-`;
-
-const Preview = styled.div`
-  margin-top: 10px;
-  max-height: 180px;
-  overflow: hidden;
-  border: 1px solid ${theme.colors.line};
-  img {
-    width: 100%;
-    object-fit: cover;
-  }
-`;
-
-export default function ArticleComposer({ articles, onSaveArticles }) {
+export const ArticleComposer = ({ articles, onSaveArticles }) => {
   const { message } = AntdApp.useApp();
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
@@ -73,16 +33,7 @@ export default function ArticleComposer({ articles, onSaveArticles }) {
   };
 
   const handleSubmit = async (values) => {
-    const excerpt = (values.excerpt || "").trim() || values.body.slice(0, 140);
-    const newArticle = {
-      id: uid(),
-      title: values.title.trim(),
-      author: (values.author || "Admin").trim() || "Admin",
-      excerpt,
-      body: values.body.trim(),
-      image: imageData,
-      date: new Date().toISOString(),
-    };
+    const newArticle = createArticle(values, imageData);
     const ok = await onSaveArticles([newArticle, ...articles]);
     if (ok) {
       setOpen(false);
@@ -184,4 +135,4 @@ export default function ArticleComposer({ articles, onSaveArticles }) {
       )}
     </Wrap>
   );
-}
+};

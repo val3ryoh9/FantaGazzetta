@@ -1,15 +1,15 @@
 import { supabase } from "./supabaseClient";
 
-function requireClient() {
+const requireClient = () => {
   if (!supabase) {
     throw new Error(
       "Configura VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY nel file .env",
     );
   }
   return supabase;
-}
+};
 
-export async function saveUsername(username) {
+export const saveUsername = async (username) => {
   const { data: userData } = await requireClient().auth.getUser();
   if (!userData.user) throw new Error("Sessione utente non disponibile");
 
@@ -18,9 +18,9 @@ export async function saveUsername(username) {
     username,
   });
   if (error) throw error;
-}
+};
 
-export async function getCurrentProfile() {
+export const getCurrentProfile = async () => {
   const { data: userData } = await requireClient().auth.getUser();
   if (!userData.user) return null;
 
@@ -31,25 +31,25 @@ export async function getCurrentProfile() {
     .maybeSingle();
   if (error) throw error;
   return data;
-}
+};
 
-export async function usernameExists(username) {
+export const usernameExists = async (username) => {
   const { data, error } = await requireClient().rpc("username_exists", {
     requested_username: username,
   });
   if (error) throw error;
   return Boolean(data);
-}
+};
 
-export async function loginWithUsername(username) {
+export const loginWithUsername = async (username) => {
   const { data, error } = await requireClient().rpc("login_with_username", {
     requested_username: username,
   });
   if (error) throw error;
   return Boolean(data);
-}
+};
 
-export async function getLeagues() {
+export const getLeagues = async () => {
   const { data, error } = await requireClient()
     .from("leagues")
     .select("id, name")
@@ -57,26 +57,26 @@ export async function getLeagues() {
     .order("name");
   if (error) throw error;
   return data;
-}
+};
 
-export async function joinLeague(leagueId, password) {
+export const joinLeague = async (leagueId, password) => {
   const { data, error } = await requireClient().rpc("join_league", {
     target_league_id: leagueId,
     league_password: password,
   });
   if (error) throw error;
   return data;
-}
+};
 
-export async function enterExistingLeague(leagueId) {
+export const enterExistingLeague = async (leagueId) => {
   const { data, error } = await requireClient().rpc("enter_league_existing", {
     target_league_id: leagueId,
   });
   if (error) throw error;
   return data;
-}
+};
 
-export async function loadLeagueData(leagueId) {
+export const loadLeagueData = async (leagueId) => {
   const client = requireClient();
   const [{ data, error }, { data: teamRows, error: teamsError }] =
     await Promise.all([
@@ -109,9 +109,9 @@ export async function loadLeagueData(leagueId) {
           [],
         coppa_matches: [],
       };
-}
+};
 
-export async function saveLeagueData(leagueId, data) {
+export const saveLeagueData = async (leagueId, data) => {
   const client = requireClient();
   const { error } = await client.from("league_data").upsert({
     league_id: leagueId,
@@ -144,9 +144,9 @@ export async function saveLeagueData(leagueId, data) {
     if (insertError) throw insertError;
   }
   return true;
-}
+};
 
-export async function signOut() {
+export const signOut = async () => {
   const { error } = await requireClient().auth.signOut();
   if (error) throw error;
-}
+};

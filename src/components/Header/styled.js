@@ -1,9 +1,7 @@
-import React, { useState } from "react";
 import styled from "styled-components";
-import { theme } from '../GlobalStyle';
+import { theme } from "../../GlobalStyle";
 
-
-const Bar = styled.header`
+export const Bar = styled.header`
   position: sticky;
   top: 0;
   z-index: 40;
@@ -11,7 +9,7 @@ const Bar = styled.header`
   border-bottom: 3px solid ${theme.colors.gold};
 `;
 
-const Inner = styled.div`
+export const Inner = styled.div`
   max-width: 1180px;
   margin: 0 auto;
   padding: 14px 20px;
@@ -25,7 +23,7 @@ const Inner = styled.div`
   }
 `;
 
-const Wordmark = styled.div`
+export const Wordmark = styled.div`
   font-family: ${theme.fonts.display};
   color: ${theme.colors.paper};
   font-weight: 700;
@@ -36,7 +34,7 @@ const Wordmark = styled.div`
   }
 `;
 
-const Nav = styled.nav`
+export const Nav = styled.nav`
   display: flex;
   gap: 4px;
   justify-self: end;
@@ -54,7 +52,7 @@ const Nav = styled.nav`
   }
 `;
 
-const CurrentLeague = styled.div`
+export const CurrentLeague = styled.div`
   min-width: 0;
   color: ${theme.colors.gold};
   font-family: ${theme.fonts.display};
@@ -70,7 +68,7 @@ const CurrentLeague = styled.div`
   }
 `;
 
-const NavLink = styled.a`
+export const NavLink = styled.a`
   font-family: ${theme.fonts.display};
   color: ${({ $active, $exit }) => {
     if ($exit) return theme.colors.red;
@@ -94,7 +92,7 @@ const NavLink = styled.a`
   }
 `;
 
-const Toggle = styled.button`
+export const Toggle = styled.button`
   display: none;
   background: none;
   border: 1px solid rgba(244, 241, 230, 0.4);
@@ -107,41 +105,3 @@ const Toggle = styled.button`
     display: block;
   }
 `;
-
-const PAGES = [
-  { key: "magazine", label: "Magazine" },
-  { key: "coppaCirco", label: "Coppa Circo" },
-  { key: "EXIT", label: "EXIT" },
-];
-
-export default function Header({ page, onNavigate, onExit, currentLeague }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <Bar>
-      <Inner>
-        <Wordmark>
-          Fanta<span>Gazzetta</span>
-        </Wordmark>
-        <CurrentLeague title={currentLeague}>{currentLeague}</CurrentLeague>
-        <Toggle onClick={() => setOpen((o) => !o)}>Menu</Toggle>
-        <Nav $open={open}>
-          {PAGES.map((p) => (
-            <NavLink
-              key={p.key}
-              $active={page === p.key}
-              $exit={p.key === "EXIT"}
-              onClick={() => {
-                if (p.key === "EXIT") onExit();
-                else onNavigate(p.key);
-                setOpen(false);
-              }}
-            >
-              {p.label}
-            </NavLink>
-          ))}
-        </Nav>
-      </Inner>
-    </Bar>
-  );
-}

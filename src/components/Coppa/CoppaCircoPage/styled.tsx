@@ -1,4 +1,4 @@
-import { theme } from '../../GlobalStyle'
+import { theme } from "../../../GlobalStyle";
 import styled, { keyframes, css } from "styled-components";
 
 export const fadeInSlide = keyframes`

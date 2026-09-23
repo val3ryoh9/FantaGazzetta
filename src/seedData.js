@@ -1,4 +1,4 @@
-import { uid } from "./utils";
+import { uid } from "./utils/utils";
 
 // Elenco gestito dall'amministratore: gli utenti possono solo scegliere una lega esistente.
 export const leagues = [
@@ -6,7 +6,7 @@ export const leagues = [
   { id: "federazione-italiana-pippe", name: "Federazione Italiana Pippe" },
 ];
 
-export function seedArticles() {
+export const seedArticles = () => {
   return [
     {
       id: uid(),
@@ -19,9 +19,9 @@ export function seedArticles() {
       date: new Date().toISOString(),
     },
   ];
-}
+};
 
-export function seedRosters() {
+export const seedRosters = () => {
   return [
     {
       id: uid(),
@@ -34,9 +34,9 @@ export function seedRosters() {
       players: [{ id: uid(), name: "Da definire", role: "P", price: 0 }],
     },
   ];
-}
+};
 
-export function seedStandings() {
+export const seedStandings = () => {
   return [
     {
       id: uid(),
@@ -61,4 +61,4 @@ export function seedStandings() {
       gs: 0,
     },
   ];
-}
+};

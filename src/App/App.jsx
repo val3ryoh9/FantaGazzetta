@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
 import OneSignal from "react-onesignal";
-import Header from "./components/Header";
-import MagazinePage from "./components/Magazine/MagazinePage";
-import CoppaCircoPage from "./components/Coppa/CoppaCircoPage";
-import AuthGate from "./components/AuthGate";
-import LeagueGate from "./components/LeagueGate";
-import { supabase } from "./supabase/supabaseClient";
+import { Header } from "../components/Header/Header";
+import { MagazinePage } from "../components/Magazine/MagazinePage/MagazinePage";
+import { CoppaCircoPage } from "../components/Coppa/CoppaCircoPage/CoppaCircoPage";
+import { AuthGate } from "../components/AuthGate/AuthGate";
+import { LeagueGate } from "../components/LeagueGate/LeagueGate";
+import { supabase } from "../supabase/supabaseClient";
 import {
   getLeagues,
   getCurrentProfile,
@@ -15,52 +14,20 @@ import {
   loadLeagueData,
   saveLeagueData,
   signOut,
-} from "./supabase/supabaseApi";
-import { theme } from "./GlobalStyle";
+} from "../supabase/supabaseApi";
+import { Main, LoadingScreen, Spinner } from "./styled";
+import {
+  SELECTED_LEAGUE_KEY,
+  LAST_PAGE_KEY,
+  oneSignalReady,
+  getRequiresPassword,
+  getSavedPage,
+  clearSavedNavigation,
+  getMembership,
+  notifyLeague,
+} from "./utils";
 
-// react-onesignal esegue le chiamate appena lo script è caricato, senza
-// aspettare la fine di init: ogni chiamata deve passare da oneSignalReady
-const oneSignalReady = OneSignal.init({
-  appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-  allowLocalhostAsSecureOrigin: true,
-  notifyButton: { enable: false },
-  serviceWorkerPath: "sw.js",
-  serviceWorkerParam: { scope: "/" },
-}).catch((initError) => {
-  console.error("Inizializzazione OneSignal fallita:", initError);
-  throw initError;
-});
-
-const SELECTED_LEAGUE_KEY = "Fantagazzetta_selected_league";
-const LAST_PAGE_KEY = "Fantagazzetta_last_page";
-
-const Main = styled.main`
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 28px 20px 80px;
-`;
-const LoadingScreen = styled.main`
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background: ${theme.colors.paper};
-`;
-const Spinner = styled.div`
-  width: 42px;
-  height: 42px;
-  border: 4px solid ${theme.colors.line};
-  border-top-color: ${theme.colors.gold};
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-export default function App() {
+export const App = () => {
   const [session, setSession] = useState(undefined);
   const [leagues, setLeagues] = useState([]);
   const [page, setPage] = useState("magazine");
@@ -92,8 +59,7 @@ export default function App() {
         setRole(null);
         setIsGlobalAdmin(false);
         setReady(false);
-        sessionStorage.removeItem(SELECTED_LEAGUE_KEY);
-        sessionStorage.removeItem(LAST_PAGE_KEY);
+        clearSavedNavigation();
       }
     });
     return () => data.subscription.unsubscribe();
@@ -115,15 +81,14 @@ export default function App() {
         if (!savedLeague) return;
 
         try {
-          const result = await enterExistingLeague(savedLeague.id);
-          const membership = Array.isArray(result) ? result[0] : result;
+          const membership = getMembership(
+            await enterExistingLeague(savedLeague.id),
+          );
           setRole(globalAdmin ? "admin" : membership.role);
-          const savedPage = sessionStorage.getItem(LAST_PAGE_KEY);
-          setPage(savedPage === "coppaCirco" ? savedPage : "magazine");
+          setPage(getSavedPage());
           setLeague(savedLeague);
         } catch {
-          sessionStorage.removeItem(SELECTED_LEAGUE_KEY);
-          sessionStorage.removeItem(LAST_PAGE_KEY);
+          clearSavedNavigation();
         }
       })
       .catch((loadError) => setError(loadError.message))
@@ -156,16 +121,11 @@ export default function App() {
   }, [league]);
 
   const enterLeague = async (nextLeague, password) => {
-    const requiresPassword =
-      !isGlobalAdmin &&
-      sessionStorage.getItem("Fantagazzetta_auth_mode") !== "login";
-    const result = requiresPassword
+    const result = getRequiresPassword(isGlobalAdmin)
       ? await joinLeague(nextLeague.id, password)
       : await enterExistingLeague(nextLeague.id);
-    const membership = Array.isArray(result) ? result[0] : result;
-    setRole(membership.role);
-    const savedPage = sessionStorage.getItem(LAST_PAGE_KEY);
-    setPage(savedPage === "coppaCirco" ? savedPage : "magazine");
+    setRole(getMembership(result).role);
+    setPage(getSavedPage());
     setLeague(nextLeague);
     sessionStorage.setItem(SELECTED_LEAGUE_KEY, nextLeague.id);
 
@@ -175,35 +135,13 @@ export default function App() {
       .catch(() => {});
   };
 
-  const notifyLeague = async ({ title, message }) => {
-    if (!league || !session?.access_token) return;
-    try {
-      const response = await fetch("/api/notify-league", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ leagueId: league.id, title, message }),
-      });
-      const result = await response.json().catch(() => null);
-      if (!response.ok || !result?.ok) {
-        console.error("Invio notifica fallito:", response.status, result);
-      }
-    } catch (notifyError) {
-      // la notifica è un extra, un fallimento qui non deve bloccare la pubblicazione
-      console.error("Invio notifica fallito:", notifyError);
-    }
-  };
-
   const exitLeague = () => {
     setPage("magazine");
     setLeague(null);
     setRole(null);
     setReady(false);
     setError("");
-    sessionStorage.removeItem(SELECTED_LEAGUE_KEY);
-    sessionStorage.removeItem(LAST_PAGE_KEY);
+    clearSavedNavigation();
   };
 
   const navigate = (nextPage) => {
@@ -236,6 +174,8 @@ export default function App() {
     const ok = await updateLeagueData({ articles: next, rosters, standings });
     if (ok && publishedArticle) {
       notifyLeague({
+        leagueId: league?.id,
+        accessToken: session?.access_token,
         title: "Nuovo articolo",
         message: `Un nuovo articolo è stato caricato su '${league.name}'`,
       });
@@ -256,16 +196,13 @@ export default function App() {
         <Spinner />
       </LoadingScreen>
     );
-  const requiresPassword =
-    !isGlobalAdmin &&
-    sessionStorage.getItem("Fantagazzetta_auth_mode") !== "login";
   if (!league)
     return (
       <LeagueGate
         leagues={leagues}
         onSelect={enterLeague}
         onExit={signOut}
-        requiresPassword={requiresPassword}
+        requiresPassword={getRequiresPassword(isGlobalAdmin)}
         initialLeagueId={sessionStorage.getItem(SELECTED_LEAGUE_KEY)}
       />
     );
@@ -302,4 +239,4 @@ export default function App() {
       </Main>
     </>
   );
-}
+};
