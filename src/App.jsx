@@ -18,6 +18,19 @@ import {
 } from "./supabase/supabaseApi";
 import { theme } from "./GlobalStyle";
 
+// react-onesignal esegue le chiamate appena lo script è caricato, senza
+// aspettare la fine di init: ogni chiamata deve passare da oneSignalReady
+const oneSignalReady = OneSignal.init({
+  appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
+  allowLocalhostAsSecureOrigin: true,
+  notifyButton: { enable: false },
+  serviceWorkerPath: "sw.js",
+  serviceWorkerParam: { scope: "/" },
+}).catch((initError) => {
+  console.error("Inizializzazione OneSignal fallita:", initError);
+  throw initError;
+});
+
 const SELECTED_LEAGUE_KEY = "Fantagazzetta_selected_league";
 const LAST_PAGE_KEY = "Fantagazzetta_last_page";
 
@@ -63,17 +76,6 @@ export default function App() {
   const [isGlobalAdmin, setIsGlobalAdmin] = useState(false);
   const [isRestoring, setIsRestoring] = useState(true);
 
-  // Inizializzazione OneSignal (una tantum al mount)
-  useEffect(() => {
-    OneSignal.init({
-      appId: import.meta.env.VITE_ONESIGNAL_APP_ID,
-      allowLocalhostAsSecureOrigin: true,
-      notifyButton: { enable: false },
-      serviceWorkerPath: "sw.js",
-      serviceWorkerParam: { scope: "/" },
-    });
-  }, []);
-
   useEffect(() => {
     if (!supabase) {
       setSession(null);
@@ -84,10 +86,8 @@ export default function App() {
     const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
 
-      if (nextSession?.user?.id) {
-        OneSignal.login(nextSession.user.id);
-      } else {
-        OneSignal.logout();
+      if (!nextSession?.user?.id) {
+        oneSignalReady.then(() => OneSignal.logout()).catch(() => {});
         setLeague(null);
         setRole(null);
         setIsGlobalAdmin(false);
@@ -121,7 +121,6 @@ export default function App() {
           const savedPage = sessionStorage.getItem(LAST_PAGE_KEY);
           setPage(savedPage === "coppaCirco" ? savedPage : "magazine");
           setLeague(savedLeague);
-          OneSignal.User.addTag(`league_${savedLeague.id}`, "1");
         } catch {
           sessionStorage.removeItem(SELECTED_LEAGUE_KEY);
           sessionStorage.removeItem(LAST_PAGE_KEY);
@@ -130,6 +129,16 @@ export default function App() {
       .catch((loadError) => setError(loadError.message))
       .finally(() => setIsRestoring(false));
   }, [session]);
+
+  const userId = session?.user?.id;
+  const leagueId = league?.id;
+  useEffect(() => {
+    if (!userId || !leagueId) return;
+    oneSignalReady
+      .then(() => OneSignal.login(userId))
+      .then(() => OneSignal.User.addTag(`league_${leagueId}`, "1"))
+      .catch((tagError) => console.error("Tag OneSignal fallito:", tagError));
+  }, [userId, leagueId]);
 
   useEffect(() => {
     if (!league) return;
@@ -159,10 +168,11 @@ export default function App() {
     setPage(savedPage === "coppaCirco" ? savedPage : "magazine");
     setLeague(nextLeague);
     sessionStorage.setItem(SELECTED_LEAGUE_KEY, nextLeague.id);
-    OneSignal.User.addTag(`league_${nextLeague.id}`, "1");
 
     // Chiedi il permesso notifiche dopo che l'utente è entrato in una lega
-    OneSignal.Notifications.requestPermission();
+    oneSignalReady
+      .then(() => OneSignal.Notifications.requestPermission())
+      .catch(() => {});
   };
 
   const notifyLeague = async ({ title, message }) => {
@@ -176,8 +186,8 @@ export default function App() {
         },
         body: JSON.stringify({ leagueId: league.id, title, message }),
       });
-      if (!response.ok) {
-        const result = await response.json().catch(() => null);
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.ok) {
         console.error("Invio notifica fallito:", response.status, result);
       }
     } catch (notifyError) {
@@ -227,7 +237,7 @@ export default function App() {
     if (ok && publishedArticle) {
       notifyLeague({
         title: "Nuovo articolo",
-        message: publishedArticle.title,
+        message: `Un nuovo articolo è stato caricato su '${league.name}'`,
       });
     }
     return ok;
